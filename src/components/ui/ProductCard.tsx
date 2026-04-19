@@ -24,8 +24,8 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
       transition={{ duration: 0.6, delay: index * 0.1 }}
       className="group relative bg-bg-card border border-border hover:border-border-gold transition-all duration-500 overflow-hidden luxury-shadow hover:luxury-shadow-lg"
     >
-      {/* Image */}
-      <Link href={`/shop/${product.slug}`} className="block relative aspect-[4/3] overflow-hidden">
+      {/* Image Area */}
+      <div className="relative aspect-[4/3] overflow-hidden">
         <Image
           src={product.images[0]}
           alt={product.title}
@@ -33,23 +33,26 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
           className="object-cover transition-transform duration-700 group-hover:scale-110"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
-        {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
+        
+        {/* Link overlay for the image only */}
+        <Link href={`/shop/${product.slug}`} className="absolute inset-0 z-10">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
+        </Link>
 
         {/* Badges */}
         {product.isSold && (
-          <div className="absolute top-4 left-4 bg-error/90 text-white text-[10px] tracking-widest uppercase px-3 py-1">
+          <div className="absolute top-4 left-4 z-20 bg-error/90 text-white text-[10px] tracking-widest uppercase px-3 py-1">
             Sold
           </div>
         )}
         {product.featured && !product.isSold && (
-          <div className="absolute top-4 left-4 bg-gold/90 text-bg-primary text-[10px] tracking-widest uppercase px-3 py-1">
+          <div className="absolute top-4 left-4 z-20 bg-gold/90 text-bg-primary text-[10px] tracking-widest uppercase px-3 py-1">
             Featured
           </div>
         )}
 
-        {/* Hover Actions */}
-        <div className="absolute inset-0 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0">
+        {/* Hover Actions - Higher z-index to be clickable */}
+        <div className="absolute inset-0 z-30 flex items-center justify-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0">
           <Link
             href={`/shop/${product.slug}`}
             className="p-3 bg-white/10 backdrop-blur-md border border-white/20 hover:bg-gold hover:border-gold transition-all duration-300 group/btn"
@@ -60,6 +63,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
             <button
               onClick={(e) => {
                 e.preventDefault();
+                e.stopPropagation();
                 addItem(product);
               }}
               className="p-3 bg-white/10 backdrop-blur-md border border-white/20 hover:bg-gold hover:border-gold transition-all duration-300 group/btn"
@@ -69,7 +73,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
             </button>
           )}
         </div>
-      </Link>
+      </div>
 
       {/* Info */}
       <div className="p-5">
