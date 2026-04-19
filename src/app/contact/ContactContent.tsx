@@ -51,9 +51,36 @@ export default function ContactContent() {
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setFormState("submitting");
-    // Simulate API call
-    await new Promise((r) => setTimeout(r, 2000));
-    setFormState("success");
+    
+    const formData = new FormData(e.currentTarget);
+    const data = {
+      name: formData.get("name"),
+      email: formData.get("email"),
+      phone: formData.get("phone"),
+      city_state: formData.get("city_state"),
+      categories: selectedCategories,
+      dimensions: formData.get("dimensions"),
+      materials: Array.from(e.currentTarget.querySelectorAll('input[type="checkbox"]:checked')).map((el: any) => el.nextElementSibling.textContent),
+      table_base: (e.currentTarget.querySelector('input[name="table_base"]:checked') as HTMLInputElement)?.nextElementSibling?.textContent,
+      style_description: formData.get("style_description"),
+      timeline: formData.get("timeline"),
+      source: formData.get("source"),
+      inspiration_images: [], // File upload handling would go here (Supabase Storage)
+    };
+
+    try {
+      const response = await fetch("/api/enquiry", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) throw new Error("Failed to submit");
+      setFormState("success");
+    } catch (err) {
+      console.error(err);
+      setFormState("error");
+    }
   }
 
   const toggleCategory = (cat: string) => {
@@ -138,19 +165,19 @@ export default function ContactContent() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className={labelClass}>Full Name *</label>
-                      <input type="text" required placeholder="Shubham Jhawar" className={inputClass} />
+                      <input name="name" type="text" required placeholder="Shubham Jhawar" className={inputClass} />
                     </div>
                     <div>
                       <label className={labelClass}>Email ID *</label>
-                      <input type="email" required placeholder="contact@artizivahomes.com" className={inputClass} />
+                      <input name="email" type="email" required placeholder="contact@artizivahomes.com" className={inputClass} />
                     </div>
                     <div>
                       <label className={labelClass}>Phone Number *</label>
-                      <input type="tel" required placeholder="+91 98XXX XXXXX" className={inputClass} />
+                      <input name="phone" type="tel" required placeholder="+91 98XXX XXXXX" className={inputClass} />
                     </div>
                     <div>
                       <label className={labelClass}>City & State *</label>
-                      <input type="text" required placeholder="Siliguri, West Bengal" className={inputClass} />
+                      <input name="city_state" type="text" required placeholder="Siliguri, West Bengal" className={inputClass} />
                     </div>
                   </div>
                 </div>
@@ -192,7 +219,7 @@ export default function ContactContent() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
                       <label className={labelClass}>Approximate Dimensions (LxWxD)</label>
-                      <input type="text" placeholder="e.g., 96 x 42 x 2 inches" className={inputClass} />
+                      <input name="dimensions" type="text" placeholder="e.g., 96 x 42 x 2 inches" className={inputClass} />
                     </div>
                     <div>
                       <label className={labelClass}>Preferred Materials</label>
@@ -229,7 +256,7 @@ export default function ContactContent() {
                   <div className="space-y-6">
                     <div>
                       <label className={labelClass}>Tell us about your style</label>
-                      <textarea rows={4} placeholder="Describe the vibe, colors, or specific patterns you have in mind..." className={inputClass} />
+                      <textarea name="style_description" rows={4} placeholder="Describe the vibe, colors, or specific patterns you have in mind..." className={inputClass} />
                     </div>
                     <div>
                       <label className={labelClass}>Upload Inspiration Images</label>
@@ -262,7 +289,7 @@ export default function ContactContent() {
                       <div className="flex-1 h-px bg-white/5" />
                     </div>
                     <label className={labelClass}>Desired Timeline</label>
-                    <select className={cn(inputClass, "appearance-none cursor-pointer")}>
+                    <select name="timeline" className={cn(inputClass, "appearance-none cursor-pointer")}>
                       <option value="" className="bg-bg-primary">Select Timeline</option>
                       {TIMELINES.map(t => <option key={t} value={t} className="bg-bg-primary">{t}</option>)}
                     </select>
@@ -274,7 +301,7 @@ export default function ContactContent() {
                       <div className="flex-1 h-px bg-white/5" />
                     </div>
                     <label className={labelClass}>How did you find us?</label>
-                    <select className={cn(inputClass, "appearance-none cursor-pointer")}>
+                    <select name="source" className={cn(inputClass, "appearance-none cursor-pointer")}>
                       <option value="" className="bg-bg-primary">Select Source</option>
                       {SOURCES.map(s => <option key={s} value={s} className="bg-bg-primary">{s}</option>)}
                     </select>

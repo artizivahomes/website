@@ -8,6 +8,7 @@ import { Menu, X, ShoppingBag } from "lucide-react";
 import { NAV_LINKS } from "@/lib/constants";
 import { useCart } from "@/components/cart/CartProvider";
 import { cn } from "@/lib/utils";
+import UserMenu from "./UserMenu";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -77,6 +78,7 @@ export default function Navbar() {
 
           {/* Right Actions */}
           <div className="flex items-center gap-4">
+            <UserMenu />
             {/* Cart */}
             <button
               onClick={() => setCartOpen(true)}
