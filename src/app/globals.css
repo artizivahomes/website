@@ -1,0 +1,284 @@
+@import "tailwindcss";
+
+/* ===== LUXURY DESIGN SYSTEM FOR ARTIZIVA HOMES ===== */
+
+@theme inline {
+  /* Color Palette */
+  --color-bg-primary: #050505;
+  --color-bg-secondary: #0c0c0c;
+  --color-bg-elevated: #141414;
+  --color-bg-card: #1a1a1a;
+  --color-bg-hover: #222222;
+
+  --color-gold: #c9a84c;
+  --color-gold-light: #e4cc7a;
+  --color-gold-dark: #9a7b2e;
+  --color-gold-muted: rgba(201, 168, 76, 0.15);
+
+  --color-cream: #f5f0e8;
+  --color-cream-dark: #d4c9b5;
+
+  --color-wood: #8b6914;
+  --color-wood-light: #b58d3a;
+  --color-wood-dark: #5c460d;
+
+  --color-text-primary: #f5f0e8;
+  --color-text-secondary: #a39e93;
+  --color-text-muted: #6b665c;
+
+  --color-border: #2a2a2a;
+  --color-border-gold: rgba(201, 168, 76, 0.3);
+
+  --color-success: #4ade80;
+  --color-error: #f87171;
+
+  --color-background: #050505;
+  --color-foreground: #f5f0e8;
+
+  /* Typography */
+  --font-serif: "Playfair Display", "Georgia", serif;
+  --font-sans: "Inter", "Helvetica Neue", sans-serif;
+
+  /* Animations */
+  --animate-fade-up: fade-up 0.8s ease-out forwards;
+  --animate-fade-in: fade-in 0.6s ease-out forwards;
+  --animate-slide-in-left: slide-in-left 0.8s ease-out forwards;
+  --animate-slide-in-right: slide-in-right 0.8s ease-out forwards;
+  --animate-shimmer: shimmer 2.5s linear infinite;
+  --animate-glow-pulse: glow-pulse 3s ease-in-out infinite;
+  --animate-float: float 6s ease-in-out infinite;
+}
+
+/* ===== KEYFRAMES ===== */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(201, 168, 76, 0.1); }
+  50% { box-shadow: 0 0 40px rgba(201, 168, 76, 0.3); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ===== BASE STYLES ===== */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-gold-dark) var(--color-bg-primary);
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--color-bg-primary);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--color-gold-dark);
+  border-radius: 3px;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--color-gold);
+  color: var(--color-bg-primary);
+}
+
+/* ===== LUXURY UTILITIES ===== */
+.glass {
+  background: rgba(10, 10, 10, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(201, 168, 76, 0.1);
+}
+
+.glass-strong {
+  background: rgba(10, 10, 10, 0.85);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(201, 168, 76, 0.15);
+}
+
+.gold-gradient {
+  background: linear-gradient(135deg, var(--color-gold-dark), var(--color-gold), var(--color-gold-light));
+}
+
+.gold-text {
+  background: linear-gradient(135deg, var(--color-gold-dark), var(--color-gold), var(--color-gold-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.resin-gradient {
+  background: linear-gradient(
+    135deg,
+    rgba(201, 168, 76, 0.05) 0%,
+    rgba(139, 105, 20, 0.08) 30%,
+    rgba(10, 10, 10, 0.95) 60%,
+    rgba(201, 168, 76, 0.03) 100%
+  );
+}
+
+.shimmer-border {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(201, 168, 76, 0.15) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2.5s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.luxury-shadow {
+  box-shadow:
+    0 4px 6px rgba(0, 0, 0, 0.4),
+    0 10px 40px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(201, 168, 76, 0.05);
+}
+
+.luxury-shadow-lg {
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.5),
+    0 20px 60px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(201, 168, 76, 0.08);
+}
+
+/* ===== SECTION DIVIDER ===== */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--color-gold-dark) 20%,
+    var(--color-gold) 50%,
+    var(--color-gold-dark) 80%,
+    transparent 100%
+  );
+  opacity: 0.3;
+}
+
+/* ===== FOCUS STYLES ===== */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--color-gold) !important;
+  box-shadow: 0 0 0 2px rgba(201, 168, 76, 0.2);
+}
+
+/* ===== LUXURY BUTTON BASE ===== */
+.btn-luxury {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 2rem;
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border-radius: 0;
+  transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-gold {
+  background: var(--color-gold);
+  color: var(--color-bg-primary);
+  border: 1px solid var(--color-gold);
+}
+
+.btn-gold:hover {
+  background: var(--color-gold-light);
+  box-shadow: 0 0 30px rgba(201, 168, 76, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--color-gold);
+  border: 1px solid var(--color-gold);
+}
+
+.btn-outline:hover {
+  background: var(--color-gold);
+  color: var(--color-bg-primary);
+  box-shadow: 0 0 30px rgba(201, 168, 76, 0.2);
+  transform: translateY(-1px);
+}
