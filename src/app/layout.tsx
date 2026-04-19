@@ -3,6 +3,7 @@ import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import MobileBottomNav from "@/components/layout/MobileBottomNav";
 import { CartProvider } from "@/components/cart/CartProvider";
 import CartSidebar from "@/components/cart/CartSidebar";
 
@@ -67,12 +68,13 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${playfair.variable} ${inter.variable} font-sans antialiased bg-bg-primary text-text-primary`}
+        className={`${playfair.variable} ${inter.variable} font-sans antialiased bg-bg-primary text-text-primary selection:bg-gold/30 selection:text-gold pb-20 md:pb-0`}
       >
         <CartProvider>
           <Navbar />
           <main className="min-h-screen">{children}</main>
           <Footer />
+          <MobileBottomNav />
           <CartSidebar />
         </CartProvider>
       </body>

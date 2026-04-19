@@ -19,7 +19,7 @@ export default function Footer() {
             </p>
             <p className="text-text-secondary text-sm leading-relaxed">
               Handcrafting bespoke epoxy &amp; resin masterpieces for luxury
-              homes since 2024. Every piece is one-of-one.
+              homes since 2023. Every piece is one-of-one.
             </p>
             <div className="flex gap-4 mt-6">
               <a
@@ -82,18 +82,18 @@ export default function Footer() {
             </h4>
             <ul className="space-y-3">
               {[
-                "Dining Tables",
-                "Coffee Tables",
-                "Wall Art",
-                "Clocks",
-                "Custom Pieces",
+                { name: "Dining Tables", query: "Dining Tables" },
+                { name: "Coffee Tables", query: "Coffee Tables" },
+                { name: "Wall Art", query: "3D Wall Hangings" },
+                { name: "Clocks", query: "Clocks" },
+                { name: "Custom Pieces", query: "Custom Artworks" },
               ].map((item) => (
-                <li key={item}>
+                <li key={item.name}>
                   <Link
-                    href="/shop"
+                    href={`/shop?category=${item.query}`}
                     className="text-text-secondary hover:text-cream text-sm transition-colors duration-300"
                   >
-                    {item}
+                    {item.name}
                   </Link>
                 </li>
               ))}

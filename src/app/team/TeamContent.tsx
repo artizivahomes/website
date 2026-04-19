@@ -64,7 +64,7 @@ export default function TeamContent() {
             <div className="w-16 h-0.5 gold-gradient mx-auto mb-6" />
             <p className="text-text-secondary text-lg max-w-2xl mx-auto leading-relaxed">
               A husband-wife duo driven by passion for craftsmanship, founded
-              Artiziva Homes in 2024 to bring the beauty of resin artistry into
+              Artiziva Homes in 2023 to bring the beauty of resin artistry into
               luxury living spaces across India.
             </p>
           </motion.div>

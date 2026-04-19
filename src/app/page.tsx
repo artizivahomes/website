@@ -48,7 +48,7 @@ export default function HomePage() {
               </h2>
               <div className="w-16 h-0.5 gold-gradient mb-8" />
               <p className="text-text-secondary text-base md:text-lg leading-relaxed mb-6">
-                Founded in 2024 by{" "}
+                Founded in 2023 by{" "}
                 <span className="text-cream font-medium">Shubham Jhawar</span> &{" "}
                 <span className="text-cream font-medium">Riya Agarwal</span> — a
                 husband-wife duo united by their passion for transforming raw timber

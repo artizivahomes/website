@@ -295,7 +295,7 @@ export const TESTIMONIALS: Testimonial[] = [
 
 export const STATS = [
   { value: "400+", label: "Bespoke Pieces Delivered" },
-  { value: "2024", label: "Founded" },
+  { value: "2023", label: "Founded" },
   { value: "100%", label: "Handcrafted in India" },
   { value: "1-of-1", label: "Every Piece Unique" },
 ];
