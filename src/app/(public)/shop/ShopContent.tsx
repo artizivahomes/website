@@ -1,53 +1,72 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { motion } from "framer-motion";
-import { SlidersHorizontal, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { SlidersHorizontal, X, Grid, LayoutList } from "lucide-react";
 import ProductCard from "@/components/ui/ProductCard";
+import ProductCarousel from "@/components/ui/ProductCarousel";
 import SectionHeading from "@/components/ui/SectionHeading";
-import { PRODUCT_CATEGORIES } from "@/lib/constants";
 import type { Product } from "@/lib/types";
 
-const PRICE_RANGES = [
-  { label: "All Prices", min: 0, max: Infinity },
-  { label: "Under ₹50,000", min: 0, max: 50000 },
-  { label: "₹50K – ₹1L", min: 50000, max: 100000 },
-  { label: "₹1L – ₹3L", min: 100000, max: 300000 },
-  { label: "Above ₹3L", min: 300000, max: Infinity },
-];
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+}
 
 export default function ShopContent() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
-  const [selectedPriceRange, setSelectedPriceRange] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
-    async function fetchProducts() {
+    async function fetchData() {
       setLoading(true);
       try {
-        const res = await fetch(`/api/products?category=${selectedCategory}`);
-        const data = await res.json();
-        setProducts(data);
+        const [prodRes, catRes] = await Promise.all([
+          fetch("/api/products"),
+          fetch("/api/categories")
+        ]);
+        const [prodData, catData] = await Promise.all([
+          prodRes.json(),
+          catRes.json()
+        ]);
+        setProducts(prodData);
+        setCategories(catData);
       } catch (err) {
-        console.error("Failed to fetch products:", err);
+        console.error("Failed to fetch shop data:", err);
       } finally {
         setLoading(false);
       }
     }
-    fetchProducts();
-  }, [selectedCategory]);
+    fetchData();
+  }, []);
 
-  const filtered = useMemo(() => {
-    return products.filter((p) => {
-      const range = PRICE_RANGES[selectedPriceRange];
-      if (p.price && (p.price < range.min || p.price > range.max)) return false;
-      return true;
+  const featuredProducts = useMemo(() => products.filter(p => p.featured), [products]);
+
+  const productsByCategory = useMemo(() => {
+    const map: Record<string, Product[]> = {};
+    products.forEach(p => {
+      if (!map[p.category]) map[p.category] = [];
+      map[p.category].push(p);
     });
-  }, [products, selectedPriceRange]);
+    return map;
+  }, [products]);
 
-  const categories = ["All", ...PRODUCT_CATEGORIES];
+  const filteredProducts = useMemo(() => {
+    if (selectedCategory === "All") return products;
+    return products.filter(p => p.category === selectedCategory);
+  }, [products, selectedCategory]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-12 h-12 border-t-2 border-gold rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -63,89 +82,100 @@ export default function ShopContent() {
         </div>
       </section>
 
-      {/* Filters + Grid */}
-      <section className="pb-24 px-6">
-        <div className="max-w-7xl mx-auto">
-          {/* Filter Bar */}
-          <div className="flex items-center justify-between mb-8 pb-6 border-b border-border">
-            <p className="text-text-secondary text-sm">{filtered.length} piece{filtered.length !== 1 ? "s" : ""}</p>
-            <button onClick={() => setShowFilters(!showFilters)} className="flex items-center gap-2 text-xs tracking-widest uppercase text-text-secondary hover:text-gold transition-colors">
-              <SlidersHorizontal className="w-4 h-4" />
-              Filters
+      {/* Persistent Category Selector */}
+      <section className="sticky top-20 z-40 bg-bg-primary/80 backdrop-blur-md border-y border-border py-4 px-6">
+        <div className="max-w-7xl mx-auto flex items-center justify-between overflow-x-auto scrollbar-hide gap-8">
+          <div className="flex items-center gap-2 min-w-max">
+            <button
+              onClick={() => setSelectedCategory("All")}
+              className={`px-6 py-2 text-[10px] tracking-[0.2em] uppercase transition-all duration-300 border ${
+                selectedCategory === "All" ? "bg-gold text-bg-primary border-gold font-bold" : "border-border text-text-secondary hover:border-gold/50"
+              }`}
+            >
+              All Categories
             </button>
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setSelectedCategory(cat.name)}
+                className={`px-6 py-2 text-[10px] tracking-[0.2em] uppercase transition-all duration-300 border ${
+                  selectedCategory === cat.name ? "bg-gold text-bg-primary border-gold font-bold" : "border-border text-text-secondary hover:border-gold/50"
+                }`}
+              >
+                {cat.name}
+              </button>
+            ))}
           </div>
+          
+          <div className="flex items-center gap-4 text-text-muted text-[10px] tracking-widest uppercase ml-auto">
+            <span className="hidden md:inline">{filteredProducts.length} Pieces</span>
+            <div className="h-4 w-px bg-border" />
+            <div className="flex items-center gap-2">
+               {selectedCategory === "All" ? <LayoutList className="w-4 h-4 text-gold" /> : <Grid className="w-4 h-4 text-gold" />}
+               <span>{selectedCategory === "All" ? "Discovery Mode" : "Grid Mode"}</span>
+            </div>
+          </div>
+        </div>
+      </section>
 
-          {/* Expandable Filters */}
-          {showFilters && (
-            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} className="mb-8 p-6 border border-border bg-bg-card">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xs tracking-widest uppercase text-gold">Filter Collection</h3>
-                <button onClick={() => { setSelectedCategory("All"); setSelectedPriceRange(0); }} className="text-xs text-text-muted hover:text-cream transition-colors">Clear All</button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <p className="text-xs tracking-wider uppercase text-text-muted mb-3">Category</p>
-                  <div className="flex flex-wrap gap-2">
-                    {categories.map((cat) => (
-                      <button key={cat} onClick={() => setSelectedCategory(cat)}
-                        className={`px-3 py-1.5 text-xs tracking-wider transition-all duration-300 ${
-                          selectedCategory === cat ? "bg-gold text-bg-primary" : "border border-border text-text-secondary hover:border-gold hover:text-gold"
-                        }`}>{cat}</button>
+      <section className="pb-32 px-6">
+        <div className="max-w-7xl mx-auto">
+          <AnimatePresence mode="wait">
+            {selectedCategory === "All" ? (
+              <motion.div
+                key="discovery"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="space-y-12"
+              >
+                {/* Featured Products Carousel */}
+                <ProductCarousel 
+                  products={featuredProducts} 
+                  title="Featured Masterpieces" 
+                />
+
+                {/* Category-wise Carousels */}
+                {categories.map(cat => {
+                  const catProducts = productsByCategory[cat.name] || [];
+                  if (catProducts.length === 0) return null;
+                  return (
+                    <ProductCarousel 
+                      key={cat.id}
+                      products={catProducts}
+                      title={cat.name}
+                    />
+                  );
+                })}
+              </motion.div>
+            ) : (
+              <motion.div
+                key="grid"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="pt-12"
+              >
+                <div className="mb-12 border-l-2 border-gold pl-6">
+                  <h2 className="font-serif text-3xl text-cream mb-2">{selectedCategory}</h2>
+                  <p className="text-text-secondary text-sm">Browsing all items in {selectedCategory}</p>
+                </div>
+
+                {filteredProducts.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {filteredProducts.map((product, i) => (
+                      <ProductCard key={product.id} product={product} index={i} />
                     ))}
                   </div>
-                </div>
-                <div>
-                  <p className="text-xs tracking-wider uppercase text-text-muted mb-3">Price Range</p>
-                  <div className="flex flex-wrap gap-2">
-                    {PRICE_RANGES.map((range, i) => (
-                      <button key={range.label} onClick={() => setSelectedPriceRange(i)}
-                        className={`px-3 py-1.5 text-xs tracking-wider transition-all duration-300 ${
-                          selectedPriceRange === i ? "bg-gold text-bg-primary" : "border border-border text-text-secondary hover:border-gold hover:text-gold"
-                        }`}>{range.label}</button>
-                    ))}
+                ) : (
+                  <div className="text-center py-32 border border-dashed border-border">
+                    <p className="text-text-secondary text-lg font-serif mb-2">No pieces found in this category</p>
+                    <button onClick={() => setSelectedCategory("All")} className="text-gold text-xs uppercase tracking-widest hover:text-cream transition-colors">Return to Shop</button>
                   </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Active Filters */}
-          {(selectedCategory !== "All" || selectedPriceRange !== 0) && (
-            <div className="flex flex-wrap gap-2 mb-6">
-              {selectedCategory !== "All" && (
-                <span className="flex items-center gap-1 px-3 py-1 bg-gold/10 border border-gold/30 text-gold text-xs">
-                  {selectedCategory}
-                  <button onClick={() => setSelectedCategory("All")}><X className="w-3 h-3" /></button>
-                </span>
-              )}
-              {selectedPriceRange !== 0 && (
-                <span className="flex items-center gap-1 px-3 py-1 bg-gold/10 border border-gold/30 text-gold text-xs">
-                  {PRICE_RANGES[selectedPriceRange].label}
-                  <button onClick={() => setSelectedPriceRange(0)}><X className="w-3 h-3" /></button>
-                </span>
-              )}
-            </div>
-          )}
-
-          {/* Product Grid */}
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="aspect-[4/3] bg-bg-card animate-pulse border border-border" />
-              ))}
-            </div>
-          ) : filtered.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-              {filtered.map((product, i) => (
-                <ProductCard key={product.id} product={product} index={i} />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-20">
-              <p className="text-text-secondary text-lg font-serif mb-2">No pieces found</p>
-              <p className="text-text-muted text-sm">Try adjusting your filters</p>
-            </div>
-          )}
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </section>
     </>

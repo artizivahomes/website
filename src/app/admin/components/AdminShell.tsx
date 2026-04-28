@@ -4,11 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 import { 
   LayoutDashboard, Package, ShoppingCart, MessageSquare, 
-  LogOut, ExternalLink, Menu, X 
+  LogOut, ExternalLink, Menu, X, Tags
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-type Tab = "overview" | "products" | "orders" | "enquiries";
+type Tab = "overview" | "products" | "categories" | "orders" | "enquiries";
 
 interface AdminShellProps {
   activeTab: Tab;
@@ -22,6 +22,8 @@ export default function AdminShell({ activeTab, setActiveTab, children }: AdminS
   const menuItems = [
     { id: "overview", label: "Overview", icon: LayoutDashboard },
     { id: "products", label: "Products", icon: Package },
+    { id: "categories", label: "Categories", icon: Tags },
+    { id: "instagram", label: "Instagram", icon: Instagram },
     { id: "orders", label: "Orders", icon: ShoppingCart },
     { id: "enquiries", label: "Enquiries", icon: MessageSquare },
   ];

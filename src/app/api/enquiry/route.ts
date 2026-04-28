@@ -6,6 +6,7 @@ import { getEnquiryAdminEmail } from "@/lib/email/templates";
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: NextRequest) {
+  console.log("Enquiry submission started");
   try {
     const body = await request.json();
     const { 
@@ -19,8 +20,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Required fields missing" }, { status: 400 });
     }
 
-    const supabase = await createServiceClient();
+    const supabase = createServiceClient();
     
+    console.log("Inserting enquiry into DB...");
     const { error: dbError } = await supabase.from("enquiries").insert({
       name,
       email,
@@ -37,24 +39,29 @@ export async function POST(request: NextRequest) {
       status: "new"
     });
 
-    if (dbError) throw dbError;
+    if (dbError) {
+      console.error("DB Insert Error:", dbError);
+      throw dbError;
+    }
+    console.log("Enquiry saved successfully to DB");
 
     // Send Admin Notification via Resend
-    try {
-      await resend.emails.send({
-        from: "Artiziva Homes <hello@artizivahomes.com>",
-        to: ["artiziva.homes@gmail.com"],
-        subject: `New Enquiry: ${name}`,
-        html: getEnquiryAdminEmail(body)
-      });
-    } catch (emailError) {
-      console.error("Failed to send enquiry notification email:", emailError);
-      // Don't fail the request if only email fails
-    }
+    // We do NOT await this to avoid hanging the response if Resend is slow
+    resend.emails.send({
+      from: "Artiziva Homes <hello@artizivahomes.com>",
+      to: ["artiziva.homes@gmail.com"],
+      subject: `New Enquiry: ${name}`,
+      html: getEnquiryAdminEmail(body)
+    }).then(({ data, error }) => {
+      if (error) console.error("Resend Error:", error);
+      else console.log("Admin notification email queued:", data?.id);
+    }).catch(err => {
+      console.error("Resend Fatal Error:", err);
+    });
 
     return NextResponse.json({ success: true, message: "Enquiry submitted successfully" });
   } catch (error) {
-    console.error("Enquiry submission error:", error);
+    console.error("Enquiry submission fatal error:", error);
     return NextResponse.json({ error: "Failed to submit enquiry" }, { status: 500 });
   }
 }
@@ -68,7 +75,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const supabase = await createServiceClient();
+    const supabase = createServiceClient();
     const { data, error } = await supabase
       .from("enquiries")
       .select("*")
@@ -95,7 +102,7 @@ export async function PATCH(request: NextRequest) {
     const { id, ...updates } = await request.json();
     if (!id) return NextResponse.json({ error: "ID is required" }, { status: 400 });
 
-    const supabase = await createServiceClient();
+    const supabase = createServiceClient();
     const { data, error } = await supabase
       .from("enquiries")
       .update(updates)

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { X, Upload, Plus, Trash2, Loader2, Check } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { PRODUCT_CATEGORIES, EPOXY_MATERIALS } from "@/lib/constants";
+import { EPOXY_MATERIALS } from "@/lib/constants";
 import { slugify } from "@/lib/utils";
 import type { Product } from "@/lib/types";
 
@@ -14,16 +14,24 @@ interface ProductFormModalProps {
   onSuccess: () => void;
 }
 
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 export default function ProductFormModal({ product, isOpen, onClose, onSuccess }: ProductFormModalProps) {
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
   
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
     short_description: "",
     description: "",
-    category: PRODUCT_CATEGORIES[0] as string,
+    category: "",
     price: "",
     price_on_request: false,
     featured: false,
@@ -32,6 +40,24 @@ export default function ProductFormModal({ product, isOpen, onClose, onSuccess }
     materials: [] as string[],
     images: [] as string[],
   });
+
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const res = await fetch("/api/categories");
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setCategories(data);
+          if (!product && data.length > 0) {
+            setFormData(prev => ({ ...prev, category: data[0].name }));
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch categories:", err);
+      }
+    }
+    if (isOpen) fetchCategories();
+  }, [isOpen, product]);
 
   useEffect(() => {
     if (product) {
@@ -46,8 +72,8 @@ export default function ProductFormModal({ product, isOpen, onClose, onSuccess }
         featured: product.featured,
         is_sold: product.is_sold,
         dimensions: product.dimensions,
-        materials: product.materials,
-        images: product.images,
+        materials: product.materials || [],
+        images: Array.isArray(product.images) ? product.images : [],
       });
     } else {
       setFormData({
@@ -55,7 +81,7 @@ export default function ProductFormModal({ product, isOpen, onClose, onSuccess }
         slug: "",
         short_description: "",
         description: "",
-        category: PRODUCT_CATEGORIES[0],
+        category: categories.length > 0 ? categories[0].name : "",
         price: "",
         price_on_request: false,
         featured: false,
@@ -65,7 +91,7 @@ export default function ProductFormModal({ product, isOpen, onClose, onSuccess }
         images: [],
       });
     }
-  }, [product, isOpen]);
+  }, [product, isOpen, categories]);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const title = e.target.value;
@@ -80,6 +106,7 @@ export default function ProductFormModal({ product, isOpen, onClose, onSuccess }
     if (!e.target.files?.length) return;
     
     setUploading(true);
+    setUploadSuccess(false);
     const files = Array.from(e.target.files);
     const data = new FormData();
     files.forEach(f => data.append("files", f));
@@ -92,6 +119,8 @@ export default function ProductFormModal({ product, isOpen, onClose, onSuccess }
       const result = await res.json();
       if (result.urls) {
         setFormData(prev => ({ ...prev, images: [...prev.images, ...result.urls] }));
+        setUploadSuccess(true);
+        setTimeout(() => setUploadSuccess(false), 3000);
       }
     } catch (err) {
       console.error("Upload failed:", err);
@@ -204,7 +233,7 @@ export default function ProductFormModal({ product, isOpen, onClose, onSuccess }
                     onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
                     className={inputClass}
                   >
-                    {PRODUCT_CATEGORIES.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                    {categories.map(cat => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
                   </select>
                 </div>
               </div>
@@ -308,7 +337,14 @@ export default function ProductFormModal({ product, isOpen, onClose, onSuccess }
 
               {/* Image Upload */}
               <div className="space-y-4">
-                <label className={labelClass}>Product Gallery</label>
+                <div className="flex items-center justify-between">
+                  <label className={labelClass}>Product Gallery</label>
+                  {uploadSuccess && (
+                    <span className="text-[10px] text-gold animate-pulse flex items-center gap-1">
+                      <Check className="w-3 h-3" /> Images Uploaded Successfully
+                    </span>
+                  )}
+                </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-4">
                   {formData.images.map((url, i) => (
                     <div key={i} className="relative aspect-square border border-border group overflow-hidden bg-bg-primary">
@@ -322,10 +358,19 @@ export default function ProductFormModal({ product, isOpen, onClose, onSuccess }
                       </button>
                     </div>
                   ))}
-                  <label className="relative aspect-square border-2 border-dashed border-border flex flex-col items-center justify-center cursor-pointer hover:border-gold hover:bg-gold/5 transition-all">
+                  <label className={`relative aspect-square border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all ${uploading ? "border-gold bg-gold/5" : "border-border hover:border-gold hover:bg-gold/5"}`}>
                     <input type="file" multiple accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
-                    {uploading ? <Loader2 className="w-5 h-5 text-gold animate-spin" /> : <Plus className="w-5 h-5 text-text-muted" />}
-                    <span className="text-[8px] tracking-widest uppercase text-text-muted mt-2">Upload</span>
+                    {uploading ? (
+                      <div className="flex flex-col items-center">
+                        <Loader2 className="w-5 h-5 text-gold animate-spin" />
+                        <span className="text-[8px] tracking-widest uppercase text-gold mt-2">Uploading...</span>
+                      </div>
+                    ) : (
+                      <>
+                        <Plus className="w-5 h-5 text-text-muted" />
+                        <span className="text-[8px] tracking-widest uppercase text-text-muted mt-2">Upload</span>
+                      </>
+                    )}
                   </label>
                 </div>
               </div>
@@ -339,7 +384,7 @@ export default function ProductFormModal({ product, isOpen, onClose, onSuccess }
               <button 
                 type="submit" 
                 form="product-form"
-                disabled={loading}
+                disabled={loading || uploading}
                 className="btn-luxury btn-gold px-8 py-2.5 text-xs flex items-center gap-2"
               >
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}

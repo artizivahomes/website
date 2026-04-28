@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get("category");
     const featured = searchParams.get("featured");
 
-    const supabase = await createServiceClient();
+    const supabase = createServiceClient();
     let query = supabase.from("products").select("*").order("sort_order", { ascending: true });
 
     if (category && category !== "All") {
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const supabase = await createServiceClient();
+    const supabase = createServiceClient();
 
     const { data, error } = await supabase
       .from("products")

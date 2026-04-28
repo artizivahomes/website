@@ -96,13 +96,19 @@ export default function ContactContent() {
         body: JSON.stringify(data),
       });
 
-      if (!response.ok) throw new Error("Failed to submit");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to submit");
+      }
+      
       setFormState("success");
       setFiles([]);
       setSelectedCategories([]);
     } catch (err) {
-      console.error(err);
+      console.error("Submission error:", err);
       setFormState("error");
+      // Reset error state after 5 seconds to allow retry
+      setTimeout(() => setFormState("idle"), 5000);
     }
   }
 
@@ -337,9 +343,16 @@ export default function ContactContent() {
                     disabled={formState === "submitting"}
                     className="btn-luxury btn-gold px-12 py-5 text-sm tracking-[0.3em] uppercase group w-full md:w-auto"
                   >
-                    {formState === "submitting" ? "Submitting Inquiry..." : "Submit My Vision"}
+                    {formState === "submitting" ? "Submitting Inquiry..." : 
+                     formState === "error" ? "Error! Please Try Again" : 
+                     "Submit My Vision"}
                     <Send className="w-4 h-4 group-hover:translate-x-1 transition-transform ml-2" />
                   </button>
+                  {formState === "error" && (
+                    <p className="mt-4 text-xs text-red-500 font-medium">
+                      Something went wrong. Please check your connection or try again later.
+                    </p>
+                  )}
                   <p className="mt-6 text-[10px] tracking-widest text-text-muted uppercase">
                     Our team typically responds within 24–48 working hours.
                   </p>
@@ -354,17 +367,37 @@ export default function ContactContent() {
       <section className="pb-32 px-6 border-t border-white/5 pt-20">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
           {[
-            { icon: MapPin, title: "Our Studio", detail: "Siliguri, West Bengal, India", sub: "Visit by appointment only" },
-            { icon: Phone, title: "Call Support", detail: "+91 98765 43210", sub: "Mon - Sat, 10am - 7pm" },
-            { icon: Instagram, title: "Instagram", detail: "@artiziva.homes", sub: INSTAGRAM_URL },
+            { 
+              icon: MapPin, 
+              title: "Our Studio", 
+              detail: "Siliguri, West Bengal, India", 
+              sub: "Visit by appointment only",
+              href: "#" 
+            },
+            { 
+              icon: Phone, 
+              title: "WhatsApp & Call", 
+              detail: "+91 96359 45687", 
+              sub: "Tap to message us",
+              href: "https://wa.me/919635945687?text=Hello%20Artiziva%20Homes%2C%20I%20am%20interested%20in%20a%20bespoke%20masterpiece." 
+            },
+            { 
+              icon: Mail, 
+              title: "Email Support", 
+              detail: "artiziva.homes@gmail.com", 
+              sub: "Tap to email us",
+              href: "mailto:artiziva.homes@gmail.com" 
+            },
           ].map((item, i) => (
-            <motion.div 
+            <motion.a 
               key={i}
+              href={item.href}
+              target={item.href.startsWith("http") ? "_blank" : undefined}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="group"
+              className="group block"
             >
               <div className="w-12 h-12 border border-gold/20 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-gold/10 transition-all duration-500">
                 <item.icon className="w-5 h-5 text-gold" />
@@ -372,7 +405,7 @@ export default function ContactContent() {
               <h4 className="text-xs tracking-[0.2em] uppercase text-gold font-semibold mb-3">{item.title}</h4>
               <p className="text-cream text-lg mb-1">{item.detail}</p>
               <p className="text-text-muted text-xs">{item.sub}</p>
-            </motion.div>
+            </motion.a>
           ))}
         </div>
       </section>

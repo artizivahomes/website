@@ -32,16 +32,18 @@ export default function Footer() {
                 <Instagram className="w-4 h-4 text-text-secondary group-hover:text-gold transition-colors" />
               </a>
               <a
-                href="mailto:hello@artizivahomes.com"
+                href="mailto:artiziva.homes@gmail.com"
                 className="p-2.5 border border-border hover:border-gold hover:bg-gold/10 transition-all duration-300 group"
                 aria-label="Email"
               >
                 <Mail className="w-4 h-4 text-text-secondary group-hover:text-gold transition-colors" />
               </a>
               <a
-                href="tel:+919876543210"
+                href="https://wa.me/919635945687?text=Hello%20Artiziva%20Homes%2C%20I%20am%20interested%20in%20a%20bespoke%20masterpiece."
+                target="_blank"
+                rel="noopener noreferrer"
                 className="p-2.5 border border-border hover:border-gold hover:bg-gold/10 transition-all duration-300 group"
-                aria-label="Phone"
+                aria-label="WhatsApp"
               >
                 <Phone className="w-4 h-4 text-text-secondary group-hover:text-gold transition-colors" />
               </a>
@@ -117,19 +119,21 @@ export default function Footer() {
               <li className="flex items-center gap-3">
                 <Phone className="w-4 h-4 text-gold shrink-0" />
                 <a
-                  href="tel:+919876543210"
+                  href="https://wa.me/919635945687?text=Hello%20Artiziva%20Homes%2C%20I%20am%20interested%20in%20a%20bespoke%20masterpiece."
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-text-secondary hover:text-cream text-sm transition-colors"
                 >
-                  +91 98765 43210
+                  +91 96359 45687
                 </a>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-gold shrink-0" />
                 <a
-                  href="mailto:hello@artizivahomes.com"
+                  href="mailto:artiziva.homes@gmail.com"
                   className="text-text-secondary hover:text-cream text-sm transition-colors"
                 >
-                  hello@artizivahomes.com
+                  artiziva.homes@gmail.com
                 </a>
               </li>
               <li className="flex items-center gap-3">

@@ -5,11 +5,16 @@ import Image from "next/image";
 import { Plus, Search, Edit, Trash2, Check, X, Filter, Loader2 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import type { Product } from "@/lib/types";
-import { PRODUCT_CATEGORIES } from "@/lib/constants";
 import ProductFormModal from "./ProductFormModal";
+
+interface Category {
+  id: string;
+  name: string;
+}
 
 export default function ProductsTab() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("All");
@@ -20,6 +25,19 @@ export default function ProductsTab() {
   useEffect(() => {
     fetchProducts();
   }, [filterCategory]);
+
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const res = await fetch("/api/categories");
+        const data = await res.json();
+        if (Array.isArray(data)) setCategories(data);
+      } catch (err) {
+        console.error("Failed to fetch categories:", err);
+      }
+    }
+    fetchCategories();
+  }, []);
 
   async function fetchProducts() {
     setLoading(true);
@@ -108,8 +126,8 @@ export default function ProductsTab() {
             className="w-full bg-bg-secondary border border-border pl-12 pr-4 py-3 text-sm text-cream appearance-none focus:border-gold outline-none transition-colors cursor-pointer"
           >
             <option value="All">All Categories</option>
-            {PRODUCT_CATEGORIES.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
+            {categories.map(cat => (
+              <option key={cat.id} value={cat.name}>{cat.name}</option>
             ))}
           </select>
         </div>

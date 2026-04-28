@@ -8,7 +8,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const supabase = await createServiceClient();
+    const supabase = createServiceClient();
 
     const { data, error } = await supabase
       .from("products")
@@ -38,7 +38,7 @@ export async function PATCH(
 
     const { id } = await params;
     const body = await request.json();
-    const supabase = await createServiceClient();
+    const supabase = createServiceClient();
 
     const { data, error } = await supabase
       .from("products")
@@ -67,7 +67,7 @@ export async function DELETE(
     }
 
     const { id } = await params;
-    const supabase = await createServiceClient();
+    const supabase = createServiceClient();
 
     const { error } = await supabase.from("products").delete().eq("id", id);
 
