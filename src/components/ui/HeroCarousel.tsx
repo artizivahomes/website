@@ -69,7 +69,7 @@ export default function HeroCarousel() {
               <span className="gold-text">Resin Masterpieces</span>
             </h1>
             <p className="text-white/70 text-base md:text-lg max-w-xl mb-8 leading-relaxed">
-              {slides[current].shortDescription}
+              {slides[current].short_description}
             </p>
             <div className="flex flex-wrap gap-4">
               <Link href="/shop" className="btn-luxury btn-gold">

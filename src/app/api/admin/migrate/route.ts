@@ -19,17 +19,17 @@ export async function GET(request: NextRequest) {
       const productData = {
         slug: p.slug,
         title: p.title,
-        short_description: p.shortDescription,
+        short_description: p.short_description,
         description: p.description,
         category: p.category,
         price: p.price,
-        price_on_request: p.priceOnRequest,
+        price_on_request: p.price_on_request,
         materials: p.materials,
         dimensions: p.dimensions,
         images: p.images,
         featured: p.featured,
-        is_sold: p.isSold,
-        sort_order: 0,
+        is_sold: p.is_sold,
+        sort_order: p.sort_order || 0,
       };
 
       const { data, error } = await supabase

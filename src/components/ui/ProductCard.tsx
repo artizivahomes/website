@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { Eye, ShoppingBag } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { useCart } from "@/components/cart/CartProvider";
-import type { Product } from "@/lib/constants";
+import type { Product } from "@/lib/types";
 
 type ProductCardProps = {
   product: Product;
@@ -40,12 +40,12 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
         </Link>
 
         {/* Badges */}
-        {product.isSold && (
+        {product.is_sold && (
           <div className="absolute top-4 left-4 z-20 bg-error/90 text-white text-[10px] tracking-widest uppercase px-3 py-1">
             Sold
           </div>
         )}
-        {product.featured && !product.isSold && (
+        {product.featured && !product.is_sold && (
           <div className="absolute top-4 left-4 z-20 bg-gold/90 text-bg-primary text-[10px] tracking-widest uppercase px-3 py-1">
             Featured
           </div>
@@ -59,7 +59,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
           >
             <Eye className="w-5 h-5 text-white group-hover/btn:text-bg-primary" />
           </Link>
-          {!product.isSold && product.price && (
+          {!product.is_sold && product.price && (
             <button
               onClick={(e) => {
                 e.preventDefault();
@@ -86,7 +86,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
           </h3>
         </Link>
         <p className="text-text-secondary text-xs leading-relaxed line-clamp-2 mb-3">
-          {product.shortDescription}
+          {product.short_description}
         </p>
         <div className="flex items-center justify-between">
           <span className="font-serif text-gold text-lg">

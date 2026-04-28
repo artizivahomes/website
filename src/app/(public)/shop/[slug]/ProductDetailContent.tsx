@@ -56,7 +56,7 @@ export default function ProductDetailContent({ product, relatedProducts }: Props
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
                   <ZoomIn className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
-                {product.isSold && (
+                {product.is_sold && (
                   <div className="absolute top-4 left-4 bg-error/90 text-white text-xs tracking-widest uppercase px-4 py-1.5">Sold</div>
                 )}
               </div>
@@ -114,13 +114,13 @@ export default function ProductDetailContent({ product, relatedProducts }: Props
 
               {/* Actions */}
               <div className="flex flex-col sm:flex-row gap-3">
-                {!product.isSold && product.price && (
+                {!product.is_sold && product.price && (
                   <button onClick={() => addItem(product)} className="btn-luxury btn-gold flex-1 group">
                     <ShoppingBag className="w-4 h-4" /> Add to Cart
                   </button>
                 )}
                 <Link href="/contact" className="btn-luxury btn-outline flex-1 text-center">
-                  <MessageSquare className="w-4 h-4" /> {product.priceOnRequest ? "Enquire for Price" : "Customize This Piece"}
+                  <MessageSquare className="w-4 h-4" /> {product.price_on_request ? "Enquire for Price" : "Customize This Piece"}
                 </Link>
               </div>
             </motion.div>

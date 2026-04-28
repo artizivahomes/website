@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import ProductDetailContent from "./ProductDetailContent";
 import { createServiceClient } from "@/lib/supabase/server";
 
-export default async function ProductPage({ params }: { params: { slug: string } }) {
+export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const supabase = await createServiceClient();
 

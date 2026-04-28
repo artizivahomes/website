@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
-import type { Product } from "@/lib/constants";
+import type { Product } from "@/lib/types";
 
 export type CartItem = {
   product: Product;

@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import { SlidersHorizontal, X } from "lucide-react";
 import ProductCard from "@/components/ui/ProductCard";
 import SectionHeading from "@/components/ui/SectionHeading";
-import { PRODUCTS, PRODUCT_CATEGORIES } from "@/lib/constants";
+import { PRODUCT_CATEGORIES } from "@/lib/constants";
+import type { Product } from "@/lib/types";
 
 const PRICE_RANGES = [
   { label: "All Prices", min: 0, max: Infinity },
@@ -16,7 +17,7 @@ const PRICE_RANGES = [
 ];
 
 export default function ShopContent() {
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [selectedPriceRange, setSelectedPriceRange] = useState(0);

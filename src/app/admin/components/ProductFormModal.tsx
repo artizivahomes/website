@@ -23,7 +23,7 @@ export default function ProductFormModal({ product, isOpen, onClose, onSuccess }
     slug: "",
     short_description: "",
     description: "",
-    category: PRODUCT_CATEGORIES[0],
+    category: PRODUCT_CATEGORIES[0] as string,
     price: "",
     price_on_request: false,
     featured: false,
