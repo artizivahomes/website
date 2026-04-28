@@ -145,6 +145,18 @@ export default function Footer() {
               </li>
             </ul>
           </div>
+
+          {/* Management */}
+          <div>
+            <h4 className="text-cream text-xs uppercase tracking-[0.2em] mb-6">Management</h4>
+            <ul className="space-y-4">
+              <li>
+                <Link href="/admin" className="text-text-secondary hover:text-gold transition-colors text-xs uppercase tracking-widest">
+                  Admin Login
+                </Link>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
 

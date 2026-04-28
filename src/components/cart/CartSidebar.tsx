@@ -145,10 +145,10 @@ export default function CartSidebar() {
                 <p className="text-text-muted text-xs">
                   Taxes and shipping calculated at checkout
                 </p>
-                <button className="btn-luxury btn-gold w-full group">
+                <Link href="/checkout" onClick={() => setIsOpen(false)} className="btn-luxury btn-gold w-full group">
                   Proceed to Checkout
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </button>
+                </Link>
                 <Link
                   href="/contact"
                   onClick={() => setIsOpen(false)}

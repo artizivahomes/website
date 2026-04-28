@@ -16,14 +16,17 @@ export default function AdminLoginPage() {
     setLoading(true);
     setError("");
     try {
-      // TODO: Connect to Supabase auth
-      // const { createClient } = await import("@/lib/supabase/client");
-      // const supabase = createClient();
-      // const { error } = await supabase.auth.signInWithPassword({ email, password });
-      // if (error) throw error;
-      // window.location.href = "/admin";
-      await new Promise((r) => setTimeout(r, 1000));
-      setError("Please configure Supabase auth credentials first. See the setup guide.");
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || "Login failed");
+
+      window.location.href = "/admin";
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {

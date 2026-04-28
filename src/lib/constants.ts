@@ -21,6 +21,35 @@ export const PRODUCT_CATEGORIES = [
   "Custom Artworks",
 ] as const;
 
+export const EPOXY_MATERIALS = {
+  woods: [
+    "Live-Edge Walnut", "Live-Edge Teak", "Reclaimed Teak", "Golden Teak", "Premium Teak",
+    "Indian Rosewood (Sheesham)", "Acacia", "Mango Wood", "Driftwood", "Maple", 
+    "Black Walnut", "Oak", "Ash", "Bamboo Slab", "Pine",
+    "Rainwood", "Series Wood", "Black Series Wood"
+  ],
+  resins: [
+    "Crystal Clear Epoxy Resin", "Deep Pour Epoxy Resin", "Pigmented Epoxy Resin", 
+    "UV-Resistant Epoxy Resin", "Metallic Epoxy Resin",
+    "Opaque Epoxy Resin", "Transluscent Epoxy Resin"
+  ],
+  decoratives: [
+    "Crushed Mirror Granules", "Coloured Glass Granules", "Sea Glass Fragments", 
+    "Gold Leaf Flakes", "Silver Leaf Flakes", "Bronze Powder", 
+    "Metallic Mica Powder (Gold)", "Metallic Mica Powder (Silver)", "Metallic Mica Powder (Copper)", 
+    "Pearlescent Powder", "Glitter Powder (Fine)", "Glitter Powder (Chunky)", 
+    "Holographic Glitter", "Glow-in-the-Dark Pigment", "Alcohol Ink Swirls", 
+    "Crushed Gemstones", "River Pebbles & Stones", "Seashells", 
+    "Dried Flowers & Botanicals", "Gold Foil Accents", "Crushed Fire Pits"
+  ],
+  bases: [
+    "Powder-Coated Steel Base (Matte Black)", "Powder-Coated Steel Base (Gold/Champagne)", 
+    "Iron Hairpin Legs", "Wooden Turned Legs", "Brass-Tipped Legs", 
+    "Hidden Steel Frame", "Tapered Wood Legs", "Rounded Steel Legs", 
+    "Stainless Steel Base", "Adjustable Levelling Feet", "Designer Wooden Legs"
+  ]
+} as const;
+
 export const BUDGET_RANGES = [
   "Under ₹50,000",
   "₹50,000 - ₹1,00,000",
