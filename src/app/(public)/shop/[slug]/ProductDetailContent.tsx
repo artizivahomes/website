@@ -114,14 +114,20 @@ export default function ProductDetailContent({ product, relatedProducts }: Props
 
               {/* Actions */}
               <div className="flex flex-col sm:flex-row gap-3">
-                {!product.is_sold && product.price && (
-                  <button onClick={() => addItem(product)} className="btn-luxury btn-gold flex-1 group">
-                    <ShoppingBag className="w-4 h-4" /> Add to Cart
-                  </button>
+                {!product.is_sold && product.price ? (
+                  <>
+                    <button onClick={() => addItem(product)} className="btn-luxury btn-gold flex-1 group">
+                      <ShoppingBag className="w-4 h-4" /> Add to Cart
+                    </button>
+                    <Link href={`/contact?product=${encodeURIComponent(product.title)}`} className="btn-luxury btn-outline flex-1 text-center">
+                      <MessageSquare className="w-4 h-4" /> Customize This Piece
+                    </Link>
+                  </>
+                ) : (
+                  <Link href={`/contact?product=${encodeURIComponent(product.title)}`} className="btn-luxury btn-gold flex-1 text-center">
+                    <MessageSquare className="w-4 h-4" /> Enquire About This Piece
+                  </Link>
                 )}
-                <Link href="/contact" className="btn-luxury btn-outline flex-1 text-center">
-                  <MessageSquare className="w-4 h-4" /> {product.price_on_request ? "Enquire for Price" : "Customize This Piece"}
-                </Link>
               </div>
             </motion.div>
           </div>

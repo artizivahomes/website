@@ -5,17 +5,15 @@ import AdminShell from "./AdminShell";
 import OverviewTab from "./OverviewTab";
 import ProductsTab from "./ProductsTab";
 import CategoriesTab from "./CategoriesTab";
-import InstagramTab from "./InstagramTab";
 import OrdersTab from "./OrdersTab";
 import EnquiriesTab from "./EnquiriesTab";
 
-type Tab = "overview" | "products" | "categories" | "instagram" | "orders" | "enquiries";
+type Tab = "overview" | "products" | "categories" | "orders" | "enquiries";
 
 const tabComponents: Record<string, React.ReactNode> = {
   overview: <OverviewTab />,
   products: <ProductsTab />,
   categories: <CategoriesTab />,
-  instagram: <InstagramTab />,
   orders: <div className="p-8 text-cream">Orders Management (Coming Soon)</div>,
   enquiries: <EnquiriesTab />,
 };

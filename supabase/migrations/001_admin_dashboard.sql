@@ -57,6 +57,15 @@ CREATE TABLE IF NOT EXISTS public.orders (
     updated_at timestamptz DEFAULT now()
 );
 
+-- Ensure all columns exist if table was already there
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS customer_address text;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS customer_city text;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS customer_pin text;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS order_status text DEFAULT 'pending';
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS payment_status text DEFAULT 'pending';
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS payment_id text;
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS notes text;
+
 -- 4. Update ENQUIRIES table (if not exists, create it; otherwise add columns)
 DO $$ 
 BEGIN

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Eye, ShoppingBag } from "lucide-react";
+import { Eye, ShoppingBag, MessageSquare } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import { useCart } from "@/components/cart/CartProvider";
 import type { Product } from "@/lib/types";
@@ -25,14 +25,18 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
       className="group relative bg-bg-card border border-border hover:border-border-gold transition-all duration-500 overflow-hidden luxury-shadow hover:luxury-shadow-lg"
     >
       {/* Image Area */}
-      <div className="relative aspect-[4/3] overflow-hidden">
-        <Image
-          src={product.images[0]}
-          alt={product.title}
-          fill
-          className="object-cover transition-transform duration-700 group-hover:scale-110"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        />
+      <div className="relative aspect-[4/3] overflow-hidden bg-bg-secondary flex items-center justify-center">
+        {product.images?.[0] ? (
+          <Image
+            src={product.images[0]}
+            alt={product.title}
+            fill
+            className="object-cover transition-transform duration-700 group-hover:scale-110"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+        ) : (
+          <ShoppingBag className="w-12 h-12 text-text-muted opacity-20" />
+        )}
         
         {/* Link overlay for the image only */}
         <Link href={`/shop/${product.slug}`} className="absolute inset-0 z-10">
@@ -59,7 +63,7 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
           >
             <Eye className="w-5 h-5 text-white group-hover/btn:text-bg-primary" />
           </Link>
-          {!product.is_sold && product.price && (
+          {!product.is_sold && product.price ? (
             <button
               onClick={(e) => {
                 e.preventDefault();
@@ -71,6 +75,15 @@ export default function ProductCard({ product, index = 0 }: ProductCardProps) {
             >
               <ShoppingBag className="w-5 h-5 text-white group-hover/btn:text-bg-primary" />
             </button>
+          ) : (
+            <Link
+              href={`/contact?product=${encodeURIComponent(product.title)}`}
+              className="p-3 bg-white/10 backdrop-blur-md border border-white/20 hover:bg-gold hover:border-gold transition-all duration-300 group/btn"
+              aria-label={`Enquire about ${product.title}`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <MessageSquare className="w-5 h-5 text-white group-hover/btn:text-bg-primary" />
+            </Link>
           )}
         </div>
       </div>

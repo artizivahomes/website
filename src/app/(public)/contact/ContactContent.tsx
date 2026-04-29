@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Send, CheckCircle, MapPin, Phone, Mail, Upload, X, ChevronDown } from "lucide-react";
 import { InstagramIcon as Instagram } from "@/components/ui/Icons";
@@ -44,9 +45,13 @@ const SOURCES = [
 ];
 
 export default function ContactContent() {
+  const searchParams = useSearchParams();
+  const productTitle = searchParams.get("product");
+  
   const [formState, setFormState] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [files, setFiles] = useState<File[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [styleDescription, setStyleDescription] = useState(productTitle ? `I am interested in: ${productTitle}` : "");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -285,7 +290,14 @@ export default function ContactContent() {
                   <div className="space-y-6">
                     <div>
                       <label className={labelClass}>Tell us about your style</label>
-                      <textarea name="style_description" rows={4} placeholder="Describe the vibe, colors, or specific patterns you have in mind..." className={inputClass} />
+                      <textarea 
+                        name="style_description" 
+                        rows={4} 
+                        placeholder="Describe the vibe, colors, or specific patterns you have in mind..." 
+                        className={inputClass}
+                        value={styleDescription}
+                        onChange={(e) => setStyleDescription(e.target.value)}
+                      />
                     </div>
                     <div>
                       <label className={labelClass}>Upload Inspiration Images</label>

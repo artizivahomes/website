@@ -78,13 +78,17 @@ export default function CartSidebar() {
                     exit={{ opacity: 0, x: 100 }}
                     className="flex gap-4 bg-bg-card p-4 border border-border"
                   >
-                    <div className="relative w-24 h-24 shrink-0 overflow-hidden">
-                      <Image
-                        src={item.product.images[0]}
-                        alt={item.product.title}
-                        fill
-                        className="object-cover"
-                      />
+                    <div className="relative w-24 h-24 shrink-0 overflow-hidden bg-bg-secondary flex items-center justify-center">
+                      {item.product.images?.[0] ? (
+                        <Image
+                          src={item.product.images[0]}
+                          alt={item.product.title}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <ShoppingBag className="w-8 h-8 text-text-muted opacity-20" />
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-serif text-sm text-cream truncate">

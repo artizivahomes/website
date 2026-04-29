@@ -46,6 +46,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }, [items, mounted]);
 
   const addItem = useCallback((product: Product) => {
+    if (product.is_sold) return;
+    
     setItems((prev) => {
       const existing = prev.find((i) => i.product.id === product.id);
       if (existing) {

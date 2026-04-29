@@ -18,42 +18,8 @@ import {
   INSTAGRAM_HANDLE,
 } from "@/lib/constants";
 
-interface InstagramPost {
-  id: string;
-  image_url: string;
-  post_url: string;
-  caption: string;
-}
-
 export default function HomePage() {
-  const [instagramPosts, setInstagramPosts] = useState<InstagramPost[]>([]);
-  const [loadingIg, setLoadingIg] = useState(true);
-
-  useEffect(() => {
-    async function fetchIgPosts() {
-      try {
-        const res = await fetch("/api/instagram/posts");
-        const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) {
-          setInstagramPosts(data.slice(0, 6));
-        } else {
-          // Fallback if table is empty
-          const fallback = PRODUCTS.slice(0, 6).map(p => ({
-            id: p.id,
-            image_url: p.images[0],
-            post_url: INSTAGRAM_URL,
-            caption: p.title
-          }));
-          setInstagramPosts(fallback);
-        }
-      } catch (err) {
-        console.error("Failed to fetch IG posts:", err);
-      } finally {
-        setLoadingIg(false);
-      }
-    }
-    fetchIgPosts();
-  }, []);
+  const instagramImages = PRODUCTS.slice(0, 6);
 
   return (
     <>
@@ -267,10 +233,10 @@ export default function HomePage() {
             description={`See our latest creations and behind-the-scenes on Instagram ${INSTAGRAM_HANDLE}`}
           />
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2">
-            {instagramPosts.map((post, i) => (
+            {instagramImages.map((product, i) => (
               <motion.a
-                key={post.id}
-                href={post.post_url || INSTAGRAM_URL}
+                key={product.id}
+                href={INSTAGRAM_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -280,8 +246,8 @@ export default function HomePage() {
                 className="relative aspect-square overflow-hidden group"
               >
                 <Image
-                  src={post.image_url}
-                  alt={post.caption || "Artiziva Homes Instagram"}
+                  src={product.images[0]}
+                  alt={product.title}
                   fill
                   className="object-cover transition-transform duration-500 group-hover:scale-110"
                   sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 16vw"

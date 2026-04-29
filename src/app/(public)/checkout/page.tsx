@@ -13,6 +13,9 @@ export default function CheckoutPage() {
   const [formState, setFormState] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [error, setError] = useState("");
 
+  const advanceAmount = subtotal / 2;
+  const remainingAmount = subtotal - advanceAmount;
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setFormState("submitting");
@@ -39,22 +42,79 @@ export default function CheckoutPage() {
     };
 
     try {
-      // 1. Create Order in DB
-      const res = await fetch("/api/orders", {
+      // 1. Create Order and get Razorpay details
+      const res = await fetch("/api/checkout/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(orderData),
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to place order");
+      if (!res.ok) throw new Error(data.error || "Failed to initiate payment");
 
-      // 2. Here we would normally trigger the Payment Gateway (Razorpay)
-      // For now, we simulate a successful payment flow
-      // In a real scenario, we'd use data.id to call Razorpay and then update payment_status
-      
-      setFormState("success");
-      clearCart();
+      // 2. Check if Razorpay is loaded
+      if (typeof (window as any).Razorpay === 'undefined') {
+        throw new Error("Payment gateway (Razorpay) is not loaded yet. Please refresh or wait a few seconds.");
+      }
+
+      // 3. Trigger Razorpay
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_live_Sj5fG60i9k724u",
+        amount: data.razorpayOrder.amount,
+        currency: data.razorpayOrder.currency,
+        name: "Artiziva Homes",
+        description: "50% Advance Payment for Order",
+        image: "/logo.png",
+        order_id: data.razorpayOrder.id,
+        handler: async function (response: any) {
+          try {
+            const verifyRes = await fetch("/api/checkout/verify-payment", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                orderId: data.orderId,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+              }),
+            });
+
+            const verifyData = await verifyRes.json();
+            if (!verifyRes.ok) throw new Error(verifyData.error || "Payment verification failed");
+
+            setFormState("success");
+            clearCart();
+          } catch (err: any) {
+            setError(err.message);
+            setFormState("error");
+          }
+        },
+        prefill: {
+          name: orderData.customer_name,
+          email: orderData.customer_email,
+          contact: orderData.customer_phone,
+        },
+        theme: {
+          color: "#D4AF37",
+        },
+        modal: {
+          ondismiss: function() {
+            setFormState("idle");
+          }
+        }
+      };
+
+      try {
+        const rzp = new (window as any).Razorpay(options);
+        rzp.on('payment.failed', function (response: any) {
+          setError("Payment failed: " + response.error.description);
+          setFormState("error");
+        });
+        rzp.open();
+      } catch (err: any) {
+        setError("Could not open payment gateway: " + err.message);
+        setFormState("error");
+      }
     } catch (err: any) {
       setError(err.message);
       setFormState("error");
@@ -66,10 +126,13 @@ export default function CheckoutPage() {
       <section className="min-h-screen flex items-center justify-center px-6">
         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="text-center max-w-lg p-12 glass-strong border border-gold/20">
           <CheckCircle className="w-20 h-20 text-gold mx-auto mb-8" />
-          <h2 className="font-serif text-4xl text-cream mb-4">Order Placed!</h2>
+          <h2 className="font-serif text-4xl text-cream mb-4">Order Confirmed!</h2>
           <p className="text-text-secondary text-lg mb-8">
-            Your masterpiece is one step closer to your home. We've sent a confirmation email to you.
+            Your 50% advance payment has been received. We've sent a confirmation email with your order details.
           </p>
+          <div className="bg-bg-card/30 border border-gold/10 p-4 mb-8 text-sm text-text-muted">
+            The remaining balance of {formatPrice(remainingAmount)} will be due at the time of dispatch.
+          </div>
           <Link href="/shop" className="btn-luxury btn-gold px-8">Continue Shopping</Link>
         </motion.div>
       </section>
@@ -129,7 +192,7 @@ export default function CheckoutPage() {
                     disabled={formState === "submitting" || items.length === 0}
                     className="btn-luxury btn-gold w-full py-5 text-sm tracking-[0.3em] uppercase group"
                   >
-                    {formState === "submitting" ? "Processing..." : "Complete Order & Pay"}
+                    {formState === "submitting" ? "Processing..." : `Pay 50% Advance (${formatPrice(advanceAmount)})`}
                     <CreditCard className="w-4 h-4 ml-2 group-hover:scale-110 transition-transform" />
                   </button>
                   <p className="mt-4 text-[10px] tracking-widest text-text-muted uppercase text-center flex items-center justify-center gap-2">
@@ -149,8 +212,12 @@ export default function CheckoutPage() {
                   ) : (
                     items.map((item) => (
                       <div key={item.product.id} className="flex gap-4">
-                        <div className="relative w-16 h-16 border border-border shrink-0">
-                          <img src={item.product.images[0]} alt="" className="w-full h-full object-cover" />
+                        <div className="relative w-16 h-16 border border-border shrink-0 bg-bg-card/50 flex items-center justify-center">
+                          {item.product.images?.[0] ? (
+                            <img src={item.product.images[0]} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <ShoppingBag className="w-6 h-6 text-text-muted opacity-20" />
+                          )}
                         </div>
                         <div className="flex-1">
                           <p className="text-sm text-cream font-serif">{item.product.title}</p>
@@ -164,17 +231,39 @@ export default function CheckoutPage() {
 
                 <div className="border-t border-border pt-6 space-y-4">
                   <div className="flex justify-between text-sm">
-                    <span className="text-text-secondary uppercase tracking-widest text-[10px]">Subtotal</span>
+                    <span className="text-text-secondary uppercase tracking-widest text-[10px]">Total Order Value</span>
                     <span className="text-cream">{formatPrice(subtotal)}</span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-text-secondary uppercase tracking-widest text-[10px]">Shipping</span>
-                    <span className="text-success uppercase tracking-widest text-[10px]">Calculated Next</span>
+                  <div className="flex justify-between text-sm border-l-2 border-gold/30 pl-4 py-1 bg-gold/5">
+                    <div>
+                      <span className="text-gold uppercase tracking-widest text-[10px] block font-bold">50% Advance to Pay Now</span>
+                      <span className="text-[9px] text-text-muted uppercase">To confirm your order</span>
+                    </div>
+                    <span className="text-gold font-bold">{formatPrice(advanceAmount)}</span>
                   </div>
+                  <div className="flex justify-between text-sm pl-4 opacity-60">
+                    <div>
+                      <span className="text-text-secondary uppercase tracking-widest text-[10px] block">Remaining Balance</span>
+                      <span className="text-[9px] text-text-muted uppercase">Due at time of dispatch</span>
+                    </div>
+                    <span className="text-cream">{formatPrice(remainingAmount)}</span>
+                  </div>
+                  
                   <div className="border-t border-border pt-4 flex justify-between items-center">
-                    <span className="text-cream uppercase tracking-widest text-xs font-semibold">Total Amount</span>
-                    <span className="text-2xl font-serif gold-text">{formatPrice(subtotal)}</span>
+                    <span className="text-cream uppercase tracking-widest text-xs font-semibold">Amount Payable Now</span>
+                    <span className="text-2xl font-serif gold-text">{formatPrice(advanceAmount)}</span>
                   </div>
+                </div>
+
+                <div className="mt-8 p-4 bg-bg-card/50 border border-border text-[10px] text-text-muted leading-relaxed uppercase tracking-wider">
+                  <p className="flex gap-2">
+                    <span className="text-gold">●</span>
+                    All pieces are handcrafted and unique.
+                  </p>
+                  <p className="flex gap-2 mt-2">
+                    <span className="text-gold">●</span>
+                    50% advance is required to begin processing/shipping.
+                  </p>
                 </div>
               </div>
             </div>

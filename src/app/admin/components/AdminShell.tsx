@@ -23,7 +23,6 @@ export default function AdminShell({ activeTab, setActiveTab, children }: AdminS
     { id: "overview", label: "Overview", icon: LayoutDashboard },
     { id: "products", label: "Products", icon: Package },
     { id: "categories", label: "Categories", icon: Tags },
-    { id: "instagram", label: "Instagram", icon: Instagram },
     { id: "orders", label: "Orders", icon: ShoppingCart },
     { id: "enquiries", label: "Enquiries", icon: MessageSquare },
   ];
